@@ -1,0 +1,12 @@
+app/media/
+app/static/
+bin/
+build/
+local/
+include/
+lib/
+src/
+*.pyc
+.*.swp
+*.db
+
