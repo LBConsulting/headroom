@@ -2,6 +2,7 @@ app/media/
 app/static/
 bin/
 build/
+share/
 local/
 include/
 lib/
