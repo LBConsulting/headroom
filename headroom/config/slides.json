@@ -17,6 +17,7 @@
 		"main_text": "Please make your selection and press continue",
 		"dyno": {
 			"p1": {
+				"img": "player-one-male.png"
 			},
 			"p2": {
 			},
