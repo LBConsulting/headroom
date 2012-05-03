@@ -1,0 +1,19 @@
+{% extends "default.html" %}
+
+{% block title %}
+Input Page
+{% endblock %}
+
+{% block content %}
+
+<fieldset>
+  <legend>Demographics Questions</legend>
+<form method="POST" action="/input">
+  <div>{{ form.birth_month.label }}: {{ form.birth_month(class="css_class") }}</div>
+  <div>{{ form.birth_year.label }}: {{ form.birth_year(class="css_class") }}</div>
+  <div>{{ form.subject_number.label }}: {{ form.subject_number(class="css_class") }}</div>
+  <div>{{ form.experiment_number.label }}: {{ form.experiment_number(class="css_class") }}</div>
+  <input type="submit" value="Begin" />
+</form>
+</fieldset>
+{% endblock %}
