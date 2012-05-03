@@ -29,6 +29,7 @@ def server_static(filename):
 
 @get('/input')
 def posted_slide():
+    form = DemographicsForm()
     ret = {}
     ## get this query into db
     for slide in s.objects():
@@ -36,11 +37,12 @@ def posted_slide():
             ret = slide
     next_slide_id = "testing"
     next_slide = "/slide/%s" % next_slide_id
-    redirect(next_slide)
+    return template("input.html", page=ret, form=form)
+    ##redirect(next_slide)
 
 @post('/input')
 def posted_input():
-    form = DemographicsForm(request.POST)
+    form = DemographicsForm(request.forms)
     if form.validate():
         return "Posted month: %s" % form.birth_month.data
     else:
@@ -50,8 +52,9 @@ def posted_input():
 def slide(slide_id="intro"):
     slides = slideload()
     ret = dict(STATIC_URL=STATIC_URL, 
-            hello=u"yoyo %s" % slide)
-    return template("slide.html", ret=ret)
+            hello=u"yoyo %s" % slide,
+            slide=slides[0])
+    return template("slide.html", page=ret)
 
 @route('/admin')
 def admin_index():
@@ -61,5 +64,6 @@ def admin_index():
 if __name__ =="__main__":
     import bottle
     bottle.debug(True)
+    bottle.TEMPLATES.clear()
     run(host='0.0.0.0', port=8080)
 
