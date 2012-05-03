@@ -28,6 +28,3 @@ class Slide():
     def by_weight(self):
         return sorted(self.slides, key=lambda slide: slide['weight'])
 
-
-
-
