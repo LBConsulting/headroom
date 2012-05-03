@@ -1,21 +1,23 @@
 from bottle import route, run, view, static_file
 from bottle import jinja2_template as template
+from db import slideload
+import simplejson as json
+from settings import STATIC_URL, CONFIG_ROOT
 
 import os
 
 # Constants on initialization
 
-# this should work across platforms
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = "/static/"
-
+## logging functions
 # Static
 
 @route('/')
 def index():
-    ret = dict(hello=u'howdy')
-    return template("index.html", ret=ret)
+    slides = slideload()
+    slide = slides['slides'][0]
+    ret = dict(slide=slide, config=dict(STATIC_URL=STATIC_URL))
+    print ret
+    return template("slide.html", page=ret)
 
 @route('/static/<filename>')
 def server_static(filename):
@@ -24,14 +26,16 @@ def server_static(filename):
 
 # Dynamic
 
-@route('/ts/<slide>')
-def text_slide(slide="intro"):
-    ret = dict(STATIC_URL=STATIC_URL, hello=u"yoyo %s" % slide)
+@route('/slide/<slide_id>')
+def slide(slide_id="intro"):
+    slides = slideload()
+    ret = dict(STATIC_URL=STATIC_URL, 
+            hello=u"yoyo %s" % slide)
     return template("slide.html", ret=ret)
 
 @route('/admin')
 def admin_index():
-    ret = dict(hello=u"admin. hello there. <h2>unce</h2>")
+    ret = dict(hello=u"admin not implemented")
     return template("admin_index.html", ret=ret)
 
 if __name__ =="__main__":

@@ -1,11 +1,13 @@
 {% block content %}
 
+<h1>{{ ret.slide.main-text }}</h1>
+
 {% block l_navigation %}
-	<a href="{{ ret.l_nav }}"><img src="{{ ret.STATIC_URL }}/lnav.png" /></a>
+	<a href="{{ ret.config.l_nav }}"><img src="{{ ret.config.STATIC_URL }}/lnav.png" /></a>
 {% endblock %}
 
 {% block r_navigation %}
-	<a href="{{ ret.l_nav }}"><img src="{{ ret.STATIC_URL }}/rnav.png" /></a>
+	<a href="{{ ret.config.l_nav }}"><img src="{{ ret.config.STATIC_URL }}/rnav.png" /></a>
 {% endblock %}
 
 {% endblock %}

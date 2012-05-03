@@ -7,7 +7,7 @@
 	},
 	{ "weight": 0,
 		"title": "Demographic",
-		"kind": "InputSlide"
+		"kind": "InputSlide",
 		"main-text": "Please input your birth month and birth year"
 	},
 	{
