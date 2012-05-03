@@ -3,18 +3,18 @@
 	{ "weight": -1,
 		"title": "Introduction",
 		"kind": "TextSlide",
-		"main-text": "Welcome to the experiment" 
+		"main_text": "Welcome to the experiment" 
 	},
 	{ "weight": 0,
 		"title": "Demographic",
 		"kind": "InputSlide",
-		"main-text": "Please input your birth month and birth year"
+		"main_text": "Please input your birth month and birth year"
 	},
 	{
 		"weight": 1,
 		"title": "Game Slide",
 		"kind": "DynoSlide",
-		"main-text": "Please make your selection and press continue",
+		"main_text": "Please make your selection and press continue",
 		"dyno": {
 			"p1": {
 			},
@@ -28,7 +28,7 @@
 		"weight": 2,
 		"title": "Outro",
 		"kind": "TextSlide",
-		"main-text": "Thank you for your participation"
+		"main_text": "Thank you for your participation"
 	}
 	],
 
