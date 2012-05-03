@@ -1,0 +1,36 @@
+{
+	"slides": [ 
+	{ "weight": -1,
+		"title": "Introduction",
+		"kind": "TextSlide",
+		"main-text": "Welcome to the experiment" 
+	},
+	{ "weight": 0,
+		"title": "Demographic",
+		"kind": "InputSlide"
+		"main-text": "Please input your birth month and birth year"
+	},
+	{
+		"weight": 1,
+		"title": "Game Slide",
+		"kind": "DynoSlide",
+		"main-text": "Please make your selection and press continue",
+		"dyno": {
+			"p1": {
+			},
+			"p2": {
+			},
+			"player": {
+			}
+		}
+	},
+	{
+		"weight": 2,
+		"title": "Outro",
+		"kind": "TextSlide",
+		"main-text": "Thank you for your participation"
+	}
+	],
+
+	"_doc": "This config contains the schema for adjusting the slides or creating your own slides. To do so, first you need to determine the slide type; if it's a static slide with only navigation input and no data, the it is a 'TextSlide'. If it's a slide for taking in data it's an 'InputSlide', finally 'DynoSlide's are primarily for the experiment."
+}

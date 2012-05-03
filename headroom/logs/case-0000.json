@@ -1,0 +1,32 @@
+{
+	"player-info": {
+		"birthyear": 88,
+		"birthmonth": 08,
+		"participant-number": 0989,
+		"experiment-code": 089,
+		"_doc": "The experiment code is also in the filename"
+	},
+
+	"experiment-runs": [
+		"id": "_43oihe894yt5vn85y985osy",
+		"run": 1,
+		"outof" 25,
+		"case": {
+			"p1-offer": 5,
+			"p2-offer": 45,
+			"player-offer": 50,
+			"player-allies": ['p1', 'p2']
+		},
+		"id": "_sogiheerigunfw84ny873tlzusgdfn",
+		"run": 2,
+		"outof" 25,
+		"case": {
+			"p1-offer": 15,
+			"p2-offer": 75,
+			"player-offer": 10,
+			"player-allies": ['p2']
+		}
+	],
+
+	"_doc": u"This log file is just an example schema"
+}
