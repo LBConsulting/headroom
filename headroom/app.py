@@ -14,7 +14,7 @@ import os
 @route('/')
 def index():
     slides = slideload()
-    slide = slides['slides'][0]
+    slide = slides['slides']
     ret = dict(slide=slide, config=dict(STATIC_URL=STATIC_URL))
     print ret
     return template("slide.html", page=ret)
