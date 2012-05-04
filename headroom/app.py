@@ -1,6 +1,6 @@
 from bottle import route, run, view, static_file, post, get, redirect
 from bottle import jinja2_template as template
-from db import slideload, Slide
+from db import jsonfileload, Slide
 import simplejson as json
 from settings import STATIC_URL, CONFIG_ROOT
 from forms import DemographicsForm
@@ -8,7 +8,7 @@ from forms import DemographicsForm
 import os
 
 # DB Constants on initialization
-s = Slide()
+##s = Slide()
 
 ## logging functions
 # Static
@@ -50,7 +50,7 @@ def posted_input():
 
 @route('/slide/<slide_id>')
 def slide(slide_id="intro"):
-    slides = slideload()
+    slides = jsonfileload()[0]
     ret = dict(STATIC_URL=STATIC_URL, 
             hello=u"yoyo %s" % slide,
             slide=slides[0])
