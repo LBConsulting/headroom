@@ -2,6 +2,7 @@
 
 import simplejson as json
 import os
+from operator import itemgetter
 from settings import CONFIG_ROOT, SLIDES_FILE
 
 # DBUTILS (MAY BE MOVED)
@@ -18,7 +19,8 @@ def slideload(slidesfile=SLIDES_FILE):
     slides = slides['slides']
     return slides
 
-class Slide():
+
+class Model(object):
     def __init__(self, slidesfile=SLIDES_FILE):
         self.slides = slideload(slidesfile)
 
@@ -26,5 +28,24 @@ class Slide():
         return self.slides
 
     def by_weight(self):
-        return sorted(self.slides, key=lambda slide: slide['weight'])
+        return sorted(self.slides, key=itemgetter('weight'))
 
+    def by_field(self, slide_id):
+        return [x[str(slide_id)] for x in self.slides]
+
+    def fields(self):
+        ret = []
+        fields = [x.keys() for x in self.slides]
+        for field in fields:
+            ret.extend(field)
+        return set(ret)
+
+    def find(self, query):
+        ret = []
+        for field in self.fields():
+            ret.extend([x['title'] for x in self.slides if x.get(field, 0).lower() == query.lower()])
+        return ret
+        
+
+class Slide(Model):
+    pass
