@@ -10,25 +10,39 @@ from settings import CONFIG_ROOT, SLIDES_FILE
 
 ## from __future__ import with
 
-def slideload(slidesfile=SLIDES_FILE):
-    slide_filepath = os.path.join(CONFIG_ROOT, slidesfile)
-    with open(slide_filepath, 'r') as slides_file:
-        slidesjson = slides_file.read()
-    slides = json.loads(slidesjson)
-    # Just get the slides, not the _doc
-    slides = slides['slides']
-    return slides
-
 
 class Model(object):
-    def __init__(self, slidesfile=SLIDES_FILE):
-        self.slides = slideload(slidesfile)
+    def __init__(self, **kwargs):
+        self.slidesfile = SLIDES_FILE
+        self.slides = self._load(slidesfile=self.slidesfile)
+
+    def _load(slidesfile=SLIDES_FILE):
+        """
+        Keeping the kwarg for quick loads
+        """
+        retpath = os.path.join(CONFIG_ROOT, slidesfile)
+        with open(retpath, 'r') as retfile:
+            retjson = retfile.read()
+        ret = json.loads(slidesjson)
+        # Just get the slides, not the _doc
+        return ret
+
+    def _write(writeme):
+        """
+        TODO: Locking
+        """
+        try:
+            towrite = json.dumps(writeme)
+        except:
+            return -1
+        slide_filepath = os.path.join(CONFIG_ROOT, slidesfile)
+        with open(slide_filepath, 'w') as slides_file:
+            slides_file.write(towrite)
+        slides_file.close()
+        return True
 
     def objects(self):
         return self.slides
-
-    def by_weight(self):
-        return sorted(self.slides, key=itemgetter('weight'))
 
     def by_field(self, slide_id):
         return [x[str(slide_id)] for x in self.slides]
@@ -48,4 +62,17 @@ class Model(object):
         
 
 class Slide(Model):
-    pass
+    def _load(slidesfile=SLIDES_FILE):
+        """
+        Keeping the kwarg for quick loads
+        """
+        slide_filepath = os.path.join(CONFIG_ROOT, slidesfile)
+        with open(slide_filepath, 'r') as slides_file:
+            slidesjson = slides_file.read()
+        slides = json.loads(slidesjson)
+        # Just get the slides, not the _doc
+        slides = slides['slides']
+        return slides
+
+    def by_weight(self):
+        return sorted(self.slides, key=itemgetter('weight'))
