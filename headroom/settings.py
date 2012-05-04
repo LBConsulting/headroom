@@ -6,5 +6,8 @@ CONFIG_ROOT = os.path.join(BASE_DIR, 'config')
 STATIC_URL = "/static/"
 # In the STATIC_ROOT
 SLIDES_FILE = "slides.json"
+# The written database. Do not store in version control
+DBSUFFIX = "headroom.jsondb"
+DBFOLDER = "db"
 
 
