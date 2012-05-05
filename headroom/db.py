@@ -56,7 +56,10 @@ class Model(object):
         except:
             self.objects = {}
         if (kwargs is not None):
-            self.objects.update(kwargs)
+            if type(self.objects) == dict:
+                self.objects.update(kwargs)
+            elif type(self.objects) == list:
+                self.objects.append(kwargs)
 
     def _load(self):
         """
@@ -112,16 +115,25 @@ class Slide(Model):
         Reduce the objects to the minimum without _doc
         """
         super(Slide, self).__init__(*args, **kwargs)
+        self.objects = self._load()
         if self.jsonfile is None:
             self.jsonfile = SLIDES_FILE
         if kwargs is not None:
-            self.objects.update(kwargs)
+            if type(self.objects) == dict:
+                self.objects.update(kwargs)
+            elif type(self.objects) == list:
+                self.objects.append(kwargs)
 
     def _load(self, slidesfile=SLIDES_FILE):
-        return dict(slides=super(Slide, self)._load()['slides'])
+        return super(Slide, self)._load()['slides']
+
+    def objects(self):
+        self.objects = super(Slide, self).objects
+        return self.objects
 
     def by_weight(self):
-        return sorted(self.objects['slides'], key=itemgetter('weight'))
+        print self.objects
+        return sorted(self.objects, key=itemgetter('weight'))
 
 class Config(Model):
     """
