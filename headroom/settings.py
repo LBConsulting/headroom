@@ -8,6 +8,6 @@ STATIC_URL = "/static/"
 SLIDES_FILE = "slides.json"
 # The written database. Do not store in version control
 DBSUFFIX = "headroom.jsondb"
-DBFOLDER = "db"
+DB_ROOT = os.path.join(BASE_DIR, "db")
 
 

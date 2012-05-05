@@ -13,6 +13,8 @@ import os
 ## logging functions
 # Static
 
+s = Slide()
+
 @route('/')
 def index():
     slide = s.by_weight()[0]
