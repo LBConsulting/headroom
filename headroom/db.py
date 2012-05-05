@@ -108,6 +108,9 @@ class Model(object):
         
 class Slide(Model):
     def __init__(self, *args, **kwargs):
+        """
+        Reduce the objects to the minimum without _doc
+        """
         super(Slide, self).__init__(*args, **kwargs)
         if self.jsonfile is None:
             self.jsonfile = SLIDES_FILE
@@ -118,7 +121,7 @@ class Slide(Model):
         return dict(slides=super(Slide, self)._load()['slides'])
 
     def by_weight(self):
-        return sorted(self.slides, key=itemgetter('weight'))
+        return sorted(self.objects['slides'], key=itemgetter('weight'))
 
 class Config(Model):
     """
