@@ -3,8 +3,9 @@
 import simplejson as json
 import os
 from operator import itemgetter
-from settings import CONFIG_ROOT, SLIDES_FILE, DBFOLDER, DBSUFFIX
+from settings import CONFIG_ROOT, SLIDES_FILE, DB_ROOT, DBSUFFIX
 import tempfile
+import shutil
 
 ## SLIDES_FILE = 'testing-3.json'
 
@@ -24,20 +25,22 @@ def jsonfileload(config):
     # Just get the slides, not the _doc
     return ret
 
-def jsonfilewrite(writein, config):
+def jsonfilewrite(config, value):
     """
     writes and entire key into one file
     """
     retpath = os.path.join(CONFIG_ROOT, config)
-    fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=DBFOLDER)
+    dbpath = os.path.join(DB_ROOT, 'database.jsondb')
+    fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=DB_ROOT)
     try:
-        jsontowrite = json.dumps(writein)
+        jsontowrite = json.dumps(value)
     except:
         print "ERROR Dumping JSON"
         return False
     try:
         with os.fdopen(fh, 'w') as jsonfile:
             jsonfile.write(jsontowrite)
+        shutil.copy(fp, dbpath)
         jsonfile.close()
         return True
     except:
