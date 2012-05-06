@@ -3,51 +3,19 @@
 import simplejson as json
 import os
 from operator import itemgetter
-from settings import CONFIG_ROOT, SLIDES_FILE, DBFOLDER, DBSUFFIX
+from settings import CONFIG_ROOT, CONFIG_FILE, DBFOLDER, DBSUFFIX
 import tempfile
+from shutil import copy
+import datetime
 
-## SLIDES_FILE = 'testing-3.json'
+__version__ = "0.2.0"
 
-# DBUTILS (MAY BE MOVED)
-# may be needed
-
+# required for python <=python2.5
 ## from __future__ import with
-
-def jsonfileload(config):
-    """
-    Keeping the kwarg for quick loads
-    """
-    retpath = os.path.join(CONFIG_ROOT, config)
-    with open(retpath, 'r') as retfile:
-        retjson = retfile.read()
-    ret = json.loads(retjson)
-    # Just get the slides, not the _doc
-    return ret
-
-def jsonfilewrite(writein, config):
-    """
-    writes and entire key into one file
-    """
-    retpath = os.path.join(CONFIG_ROOT, config)
-    fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=DBFOLDER)
-    try:
-        jsontowrite = json.dumps(writein)
-    except:
-        print "ERROR Dumping JSON"
-        return False
-    try:
-        with os.fdopen(fh, 'w') as jsonfile:
-            jsonfile.write(jsontowrite)
-        jsonfile.close()
-        return True
-    except:
-        print "ERROR Writing File"
-        return False
-
 
 class Model(object):
     def __init__(self, *args, **kwargs):
-        self.jsonfile = SLIDES_FILE
+        self.config = CONFIG_FILE
         try:
             self.objects = self._load()
         except:
@@ -55,30 +23,44 @@ class Model(object):
         if (kwargs is not None):
             self.objects.update(kwargs)
 
-    def _load(self):
+    def _load(self, **kargs):
         """
         Keeping the kwarg for quick loads
         """
-        retpath = os.path.join(CONFIG_ROOT, self.jsonfile)
+        retpath = os.path.join(CONFIG_ROOT, self.config)
         with open(retpath, 'r') as retfile:
             retjson = retfile.read()
         ret = json.loads(retjson)
         # Just get the slides, not the _doc
         return ret
 
-    def _write(self, writeme):
+    def _loaddb(self, dbname="models"):
+        retpath = os.path.join(DBFOLDER, "%s.jsondb" % dbname)
+        with open(retpath, 'r') as retfile:
+            retjson = retfile.read()
+        ret = json.loads(retjson)
+        # Just get the slides, not the _doc
+        return ret
+
+    def _write(self, config):
         """
-        TODO: Locking
+        Writes to the CONFIG_FILE
         """
+        retpath = os.path.join(CONFIG_ROOT, self.config)
+        fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=DBFOLDER)
         try:
-            towrite = json.dumps(writeme)
+            configtowrite = json.dumps(config)
         except:
-            return -1
-        slide_filepath = os.path.join(CONFIG_ROOT, self.jsonfile)
-        with open(slide_filepath, 'w') as slides_file:
-            slides_file.write(towrite)
-        slides_file.close()
-        return True
+            print "ERROR Dumping Config JSON"
+            return False
+        try:
+            with os.fdopen(fh, 'w') as f:
+                f.write(configtowrite)
+            f.close()
+            return True
+        except:
+            print "ERROR Writing File"
+            return False
 
     def objects(self):
         return self.objects
@@ -105,17 +87,64 @@ class Model(object):
         
 class Slide(Model):
     def __init__(self, *args, **kwargs):
+        self.db = self._loaddb()
+        self.tmpon = False
+        self.dbfp = ""
         super(Slide, self).__init__(*args, **kwargs)
         if self.jsonfile is None:
-            self.jsonfile = SLIDES_FILE
+            self.jsonfile = CONFIG_FILE
         if kwargs is not None:
             self.objects.update(kwargs)
 
-    def _load(self, slidesfile=SLIDES_FILE):
+    def _load(self):
         return dict(slides=super(Slide, self)._load()['slides'])
 
+    def _loaddb(self):
+        return super(Slide, self)._loaddb('slidedb'))
+
+    def _tmpdb(self, dbdata, db=DBFOLDER):
+        """
+        make a temporary file to write the db into
+        """
+        fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=db)
+        try:
+            dbtowrite = json.dumps(dbdata)
+        except:
+            print 'Could not dump json to db'
+            return False
+        try:
+            with os.fdopen(fh, 'w') as f:
+                f.write(dbtowrite)
+            f.close()
+            self.tmpon, self.dbfp = True, fp
+            return True
+        except:
+            print "Error writing DB"
+            return False
+
+    def _writedb(self, dbname=None, db=DBFOLDER):
+        """
+        simply copies the tmp file to the db 
+        folder and adds a timestamp to the
+        filename. 
+        """
+        if dbname is not None:
+            dbname = "%s.jsondb" % dbname
+        dbname = "%(dbname)s-%(timestamp)s.jsondb" % dict(dbname='slidedb',
+                timestamp=datetime.datetime.strftime(datetime.datetime.now(),
+                    format="%Y%m%d"))
+        fp = os.path.join(db, dbname)
+        copy(self.dbfp, 
+        self.tmpon, self.dbfp = False, fp
+        return True
+
+    def slides(self):
+        return self.objects['slides']
+
+
+
     def by_weight(self):
-        return sorted(self.slides, key=itemgetter('weight'))
+        return sorted(self.objects['slides'], key=itemgetter('weight'))
 
 class Config(Model):
     """
