@@ -100,7 +100,7 @@ class Slide(Model):
         return dict(slides=super(Slide, self)._load()['slides'])
 
     def _loaddb(self):
-        return super(Slide, self)._loaddb('slidedb'))
+        return super((Slide, self)._loaddb('slidedb'))
 
     def _tmpdb(self, dbdata, db=DBFOLDER):
         """
@@ -132,9 +132,9 @@ class Slide(Model):
             dbname = "%s.jsondb" % dbname
         dbname = "%(dbname)s-%(timestamp)s.jsondb" % dict(dbname='slidedb',
                 timestamp=datetime.datetime.strftime(datetime.datetime.now(),
-                    format="%Y%m%d"))
+                    format="%Y%m%d-%H%M%S"))
         fp = os.path.join(db, dbname)
-        copy(self.dbfp, 
+        copy(self.dbfp, fp)
         self.tmpon, self.dbfp = False, fp
         return True
 
