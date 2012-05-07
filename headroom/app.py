@@ -1,7 +1,6 @@
 from bottle import route, run, view, static_file, post, get, redirect
 from bottle import jinja2_template as template
-from db import jsonfileload, Slide
-import simplejson as json
+from db import Slide
 from settings import STATIC_URL, CONFIG_ROOT
 from forms import DemographicsForm
 

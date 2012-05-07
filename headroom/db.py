@@ -3,7 +3,7 @@
 import simplejson as json
 import os
 from operator import itemgetter
-from settings import CONFIG_ROOT, CONFIG_FILE, DBFOLDER, DBSUFFIX
+from settings import CONFIG_ROOT, CONFIG_FILE, DB_ROOT, DBSUFFIX
 import tempfile
 from shutil import copy
 import datetime
@@ -35,7 +35,7 @@ class Model(object):
         return ret
 
     def _loaddb(self, dbname="models"):
-        retpath = os.path.join(DBFOLDER, "%s.jsondb" % dbname)
+        retpath = os.path.join(DB_ROOT, "%s.jsondb" % dbname)
         with open(retpath, 'r') as retfile:
             retjson = retfile.read()
         ret = json.loads(retjson)
@@ -47,7 +47,7 @@ class Model(object):
         Writes to the CONFIG_FILE
         """
         retpath = os.path.join(CONFIG_ROOT, self.config)
-        fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=DBFOLDER)
+        fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=DB_ROOT)
         try:
             configtowrite = json.dumps(config)
         except:
@@ -91,8 +91,8 @@ class Slide(Model):
         self.tmpon = False
         self.dbfp = ""
         super(Slide, self).__init__(*args, **kwargs)
-        if self.jsonfile is None:
-            self.jsonfile = CONFIG_FILE
+        if self.config is None:
+            self.config = CONFIG_FILE
         if kwargs is not None:
             self.objects.update(kwargs)
 
@@ -100,9 +100,9 @@ class Slide(Model):
         return dict(slides=super(Slide, self)._load()['slides'])
 
     def _loaddb(self):
-        return super((Slide, self)._loaddb('slidedb'))
+        return super(Slide, self)._loaddb('slidedb')
 
-    def _tmpdb(self, dbdata, db=DBFOLDER):
+    def _tmpdb(self, dbdata, db=DB_ROOT):
         """
         make a temporary file to write the db into
         """
@@ -122,7 +122,7 @@ class Slide(Model):
             print "Error writing DB"
             return False
 
-    def _writedb(self, dbname=None, db=DBFOLDER):
+    def _writedb(self, dbname=None, db=DB_ROOT):
         """
         simply copies the tmp file to the db 
         folder and adds a timestamp to the
