@@ -7,6 +7,7 @@ from settings import CONFIG_ROOT, CONFIG_FILE, DB_ROOT, DBSUFFIX
 import tempfile
 from shutil import copy
 import datetime
+from uuid import uuid1 as uuid
 
 __version__ = "0.2.0"
 
@@ -116,11 +117,36 @@ class Slide(Model):
             with os.fdopen(fh, 'w') as f:
                 f.write(dbtowrite)
             f.close()
-            self.tmpon, self.dbfp = True, fp
+            self.tmpon, self.dbfp, self.dbfh = True, fp, fh
             return True
         except:
             print "Error writing DB"
             return False
+
+    def _dynodb(self, dbname=None, db=DB_ROOT):
+        """
+        writes all dynamic keys (id, datetime/RT, and slide order)
+        to the dynamicdb
+        """
+        if self.tmpon:
+            try:
+                incr = 0
+                for slide in self.db.by_weight():
+                    incr += 1
+                    _metadata = dict(id=incr, uuid=str(uuid()))
+                    slide.update(_metadata)
+                    try:
+                        with os.fdopen(self.dbfh, "w") as f:
+                            f.write(json.dumps(slide))
+                        f.close()
+                        self.db = super(Slide, self)._loaddb(self.fp)
+                    except:
+                        print "ERROR, couldn't write file"
+                        return False
+            except:
+                print "ERROR, couldn't write file"
+                return False
+
 
     def _writedb(self, dbname=None, db=DB_ROOT):
         """
@@ -141,10 +167,25 @@ class Slide(Model):
     def slides(self):
         return self.objects['slides']
 
-
-
     def by_weight(self):
         return sorted(self.objects['slides'], key=itemgetter('weight'))
+
+    def by_id(self):
+        return 
+
+    def next(self):
+        """
+        finds the next slide in relation to the current one
+        """
+        return
+
+    def previous(self):
+        """
+        finds the previous slide in relation to the current one
+        """
+        return
+
+
 
 class Config(Model):
     """
