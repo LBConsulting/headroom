@@ -7,28 +7,34 @@ from forms import DemographicsForm
 
 import os
 
-# DB Constants on initialization
-##s = Slide()
+__version__ = "0.2.0"
+
+# Homebrewed JSONDB Manager on initialization
+s = Slide()
 
 ## logging functions
 # Static
 
-s = Slide()
-
-@route('/')
-def index():
-    slide = s.by_weight()[0]
-    ret = dict(slide=slide, config=dict(STATIC_URL=STATIC_URL))
-    print ret
-    return template("slide.html", page=ret)
-
+#files
 @route('/static/<filename>')
 def server_static(filename):
-    # we use the app.py file itself to determine the location of '/static/'
     return static_file(filename, root=STATIC_ROOT)
+
+
+
+#the homepage just uses the first slide (based on weight)
+@route('/')
+def index():
+    # get the first slide
+    slide = s.by_weight()[0]
+    slide['_url'] = '/'
+    page = dict(slide=slide,config=dict(STATIC_URL=STATIC_URL))
+    return template("slide.html", page=page)
 
 # Dynamic
 
+#forms are pumped through here
+#this probably needs to be worked on after the urls
 @get('/input')
 def posted_slide():
     form = DemographicsForm()
@@ -50,19 +56,23 @@ def posted_input():
     else:
         return "Error..."
 
-@route('/slide/<slide_id>')
-def slide(slide_id="intro"):
-    slides = jsonfileload()[0]
+@route('/slide/<slide_id:int>')
+def slide(slide_id=None):
+    if slide_id is None or 0:
+        return redirect('/')
+    slide = s.by_id(slide_id)
     ret = dict(STATIC_URL=STATIC_URL, 
             hello=u"yoyo %s" % slide,
-            slide=slides[0])
+            slide=slide)
     return template("slide.html", page=ret)
 
+# admin for version 2.0
 @route('/admin')
 def admin_index():
     ret = dict(hello=u"admin not implemented")
     return template("admin_index.html", ret=ret)
 
+# This is where the conductor taps her wand.
 if __name__ =="__main__":
     import bottle
     bottle.debug(True)
