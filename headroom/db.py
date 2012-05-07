@@ -29,7 +29,7 @@ def jsonfilewrite(config, value):
     """
     writes and entire key into one file
     """
-    retpath = os.path.join(CONFIG_ROOT, config)
+    ##retpath = os.path.join(CONFIG_ROOT, config)
     dbpath = os.path.join(DB_ROOT, 'database.jsondb')
     fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=DB_ROOT)
     try:
