@@ -55,14 +55,16 @@ def posted_input():
     else:
         return "Error..."
 
-@route('/slide/<slide_id:int>')
+@route('/s/<slide_id:int>')
 def slide(slide_id=None):
     if slide_id is None or 0:
         return redirect('/')
     slide = s.by_id(slide_id)
     ret = dict(STATIC_URL=STATIC_URL, 
-            hello=u"yoyo %s" % slide,
-            slide=slide)
+            slide=slide,
+            next=slide.next(),
+            previous=slide.previous()
+            )
     return template("slide.html", page=ret)
 
 # admin for version 2.0

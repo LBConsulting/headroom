@@ -17,6 +17,8 @@ __version__ = "0.2.0"
 class Model(object):
     def __init__(self, *args, **kwargs):
         self.config = CONFIG_FILE
+        # an individually selected object
+        self.obj = None
         try:
             self.objects = self._load()
         except:
@@ -35,12 +37,15 @@ class Model(object):
         # Just get the slides, not the _doc
         return ret
 
-    def _loaddb(self, dbname="models"):
-        retpath = os.path.join(DB_ROOT, "%s.jsondb" % dbname)
-        with open(retpath, 'r') as retfile:
-            retjson = retfile.read()
+    def _loaddb(self, dbname="models", dbpath=None):
+        if dbpath is None:
+            retpath = os.path.join(DB_ROOT, "%s.jsondb" % dbname)
+            with open(retpath, 'r') as retfile:
+                retjson = retfile.read()
+        else:
+            with open(dbpath, 'r') as f:
+                retjson = f.read()
         ret = json.loads(retjson)
-        # Just get the slides, not the _doc
         return ret
 
     def _write(self, config):
@@ -133,20 +138,27 @@ class Slide(Model):
         """
         writes all dynamic keys (id, datetime/RT, and slide order)
         to the dynamicdb
+        I think this is a JOIN operation, but I'm not an expert.
         """
         if self.tmpon:
             try:
                 incr = 0
                 for slide in self.by_weight():
                     incr += 1
-                    _metadata = dict(id=incr, uuid=str(uuid()))
+                    _metadata = dict(_metadata=dict(
+                        id=incr,
+                        uuid=str(uuid()),
+                        ## replace with dynamic url-builder
+                        url="/s/%i" % incr
+                        ))
                     print slide
                     slide.update(_metadata)
+                    print "updated to %s" % slide
                 try:
                     with open(self.dbfp, "w") as f:
                         f.write(json.dumps(slide))
                     f.close()
-                    ##self.db = super(Slide, self)._loaddb(self.fp)
+                    self.db = super(Slide, self)._loaddb(dbpath=self.dbfp)
                 except:
                     print "ERROR, couldn't write file"
                     return False
@@ -183,22 +195,38 @@ class Slide(Model):
         items already in the database.
         """
         slide = {}
-        for obj in self.objects['slides']:
-            if obj['_metadata']['id'] == sid:
-                slide.update(obj)
+        try:
+            for obj in self.objects['slides']:
+                ## this key isn't in for some reason
+                if obj['_metadata']['id'] == sid:
+                ##if obj['id'] == sid:
+                    slide.update(obj)
+        except:
+            print "No ID on model"
+            return False
+        self.obj = slide
         return slide
+
+    def sorted_id(self):
+        """
+        sorted by id
+        """
+        slides = sorted(self.objects['slides'], key=itemgetter('id'))
+        return slides
 
     def next(self):
         """
         finds the next slide in relation to the current one
         """
-        return
+        ret = self.by_id(self.obj['id'] + 1)
+        return ret
 
     def previous(self):
         """
         finds the previous slide in relation to the current one
         """
-        return
+        ret = self.by_id(self.obj['id'] - 1)
+        return ret
 
 
 
