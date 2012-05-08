@@ -103,25 +103,31 @@ class Slide(Model):
     def _loaddb(self):
         return super(Slide, self)._loaddb('slidedb')
 
-    def _tmpdb(self, dbdata, db=DB_ROOT):
+    def _tmpdb(self, dbdata=None, db=DB_ROOT):
         """
         make a temporary file to write the db into
         """
         fh, fp = tempfile.mkstemp(suffix=DBSUFFIX, dir=db)
-        try:
-            dbtowrite = json.dumps(dbdata)
-        except:
-            print 'Could not dump json to db'
-            return False
-        try:
-            with os.fdopen(fh, 'w') as f:
-                f.write(dbtowrite)
-            f.close()
-            self.tmpon, self.dbfp, self.dbfh = True, fp, fh
-            return True
-        except:
-            print "Error writing DB"
-            return False
+        if dbdata is not None:
+            try:
+                dbtowrite = json.dumps(dbdata)
+            except:
+                print 'Could not dump json to db'
+                return False
+            try:
+                with os.fdopen(fh, 'w+') as f:
+                    f.write(dbtowrite)
+                f.close()
+                self.tmpon, self.dbfp, self.dbfh = True, fp, fh
+                return True
+            except:
+                print "Error writing DB"
+                return False
+        with os.fdopen(fh, 'w+') as f:
+            f.write(json.dumps(self.objects))
+        f.close()
+        self.tmpon, self.dbfp, self.dbfh = True, fp, fh
+        return True
 
     def _dynodb(self, dbname=None, db=DB_ROOT):
         """
@@ -131,20 +137,21 @@ class Slide(Model):
         if self.tmpon:
             try:
                 incr = 0
-                for slide in self.db.by_weight():
+                for slide in self.by_weight():
                     incr += 1
                     _metadata = dict(id=incr, uuid=str(uuid()))
+                    print slide
                     slide.update(_metadata)
-                    try:
-                        with os.fdopen(self.dbfh, "w") as f:
-                            f.write(json.dumps(slide))
-                        f.close()
-                        self.db = super(Slide, self)._loaddb(self.fp)
-                    except:
-                        print "ERROR, couldn't write file"
-                        return False
+                try:
+                    with open(self.dbfp, "w") as f:
+                        f.write(json.dumps(slide))
+                    f.close()
+                    ##self.db = super(Slide, self)._loaddb(self.fp)
+                except:
+                    print "ERROR, couldn't write file"
+                    return False
             except:
-                print "ERROR, couldn't write file"
+                print "ERROR, couldn't insert into file"
                 return False
 
 
@@ -170,8 +177,16 @@ class Slide(Model):
     def by_weight(self):
         return sorted(self.objects['slides'], key=itemgetter('weight'))
 
-    def by_id(self):
-        return 
+    def by_id(self, sid):
+        """
+        The id <sid> is determined by weight order and is only available to
+        items already in the database.
+        """
+        slide = {}
+        for obj in self.objects['slides']:
+            if obj['_metadata']['id'] == sid:
+                slide.update(obj)
+        return slide
 
     def next(self):
         """
