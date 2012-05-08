@@ -10,6 +10,8 @@ __version__ = "0.2.0"
 
 # Homebrewed JSONDB Manager on initialization
 s = Slide()
+s._tmpdb()
+s._dynodb()
 
 ## logging functions
 # Static
@@ -19,12 +21,19 @@ s = Slide()
 def server_static(filename):
     return static_file(filename, root=STATIC_ROOT)
 
-
-
 #the homepage just uses the first slide (based on weight)
 @route('/')
 def index():
     # get the first slide
+    slide = s.by_id(1)
+    ret = dict(STATIC_URL=STATIC_URL, 
+            slide=slide,
+            nxt=s.nxt()['_metadata']['url'],
+            previous=s.previous()['_metadata']['url']
+            )
+    return template("slide.html", page=ret)
+
+
     slide = s.by_weight()[0]
     slide['_url'] = '/'
     page = dict(slide=slide,config=dict(STATIC_URL=STATIC_URL))
@@ -60,10 +69,16 @@ def slide(slide_id=None):
     if slide_id is None or 0:
         return redirect('/')
     slide = s.by_id(slide_id)
+    nxt, previous = '', ''
+    try:
+        nxt=s.nxt()['_metadata']['url'],
+        previous=s.previous()['_metadata']['url']
+    except:
+        pass
     ret = dict(STATIC_URL=STATIC_URL, 
             slide=slide,
-            next=slide.next(),
-            previous=slide.previous()
+            nxt=nxt,
+            previous=previous
             )
     return template("slide.html", page=ret)
 

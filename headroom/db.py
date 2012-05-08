@@ -214,21 +214,31 @@ class Slide(Model):
         slides = sorted(self.objects['slides'], key=itemgetter('id'))
         return slides
 
-    def next(self):
+    def nxt(self, sid=1):
         """
         finds the next slide in relation to the current one
         """
-        ret = self.by_id(self.obj['id'] + 1)
-        return ret
+        if self.obj:
+            ret = self.by_id(self.obj['_metadata']['id'] + 1)
+            try:
+                meta = ret['_metadata']
+                return ret
+            except:
+                return False
+        return False
 
     def previous(self):
         """
         finds the previous slide in relation to the current one
         """
-        ret = self.by_id(self.obj['id'] - 1)
-        return ret
-
-
+        if self.obj:
+            ret = self.by_id(self.obj['_metadata']['id'] - 1)
+            try:
+                meta = ret['_metadata']
+                return ret
+            except:
+                return False
+        return False
 
 class Config(Model):
     """
