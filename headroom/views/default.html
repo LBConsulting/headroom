@@ -14,10 +14,10 @@
 			<nav id="sitenav">
 			{% block sitenav %}
 				{% if page.previous %}
-					<a href="page.previous">&laquo; previous</a>
+        <a href="{{ page.previous }}">&laquo; previous</a>
 				{% endif %}
-				{% if page.next %}
-					<a href="page.next">next &raquo; </a>
+				{% if page.nxt %}
+        <a href="{{ page.nxt }}">next &raquo;</a>
 				{% endif %}
 			{% endblock %}
 			</nav>
